@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from "http-status";
-import { TErrorResponse, TErrorSources } from "./error.interface";
+import { TErrorResponse } from "./error.interface";
 
 const handleDuplicateError = (err: any): TErrorResponse => {
   const match = err.message.match(/\d+(\.\d+)?/g);

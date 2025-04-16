@@ -21,6 +21,11 @@ const userSchema = new Schema<TUser>(
     passworChangeAt: {
       type: Date,
     },
+    email: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     role: {
       type: String,
       enum: roles,

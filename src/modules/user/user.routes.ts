@@ -1,5 +1,5 @@
 import { UserController } from "./user.controller";
-import express, { Router } from "express";
+import { Router } from "express";
 
 const router = Router();
 router.post("/create-member", UserController.createMember);

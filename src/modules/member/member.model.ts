@@ -1,4 +1,4 @@
-import { Schema, Types } from "mongoose";
+import { model, Schema } from "mongoose";
 import { TMember } from "./member.interface";
 
 const memberSchema = new Schema<TMember>(
@@ -85,4 +85,4 @@ const memberSchema = new Schema<TMember>(
   }
 );
 
-
+export const Member = model<TMember>("members", memberSchema);

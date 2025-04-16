@@ -1,4 +1,4 @@
-import { Date, Types } from "mongoose";
+import { Date } from "mongoose";
 
 export type TUser = {
   id: string;

@@ -5,7 +5,8 @@ import { User } from "./user.model";
 
 const createMemberIntoDB = async (pass: string, payload: TMember) => {
   const userData: Partial<TUser> = {
-    id: "1234",
+    id: "55555",
+
     password: pass || config.DEFAULT_PASS,
     email: payload.email,
   };
