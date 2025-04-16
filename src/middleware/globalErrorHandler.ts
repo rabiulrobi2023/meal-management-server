@@ -6,6 +6,8 @@ import { TErrorSources } from "../error/error.interface";
 import handleDuplicateError from "../error/handleDuplicateError";
 import mongoose from "mongoose";
 import handleValidationError from "../error/handleValidationError";
+import { ZodError } from "zod";
+import handleZodValidationError from "../error/handleZodValidationError";
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   let statusCode = 500;
@@ -18,7 +20,12 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     },
   ];
 
-  if (err.name === "ValidationError") {
+  if (err instanceof ZodError) {
+    const simplifyError = handleZodValidationError(err);
+    statusCode = simplifyError.statusCode;
+    message = simplifyError.message;
+    source = simplifyError.errorSources;
+  } else if (err.name === "ValidationError") {
     const simplifyError = handleValidationError(err);
     statusCode = simplifyError.statusCode;
     message = simplifyError.message;
