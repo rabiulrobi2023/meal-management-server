@@ -1,1 +1,1 @@
-export const status =["inprogress","block"]
+export const status =["in-progress","block"]

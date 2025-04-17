@@ -8,6 +8,6 @@ export type TUser = {
   email: string;
   role: "admin" | "manager" | "member";
   isApproved: boolean;
-  status: "inprogress" | "block";
+  status: "in-progress" | "block";
   isDeleted: boolean;
 };

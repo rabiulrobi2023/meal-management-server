@@ -2,13 +2,15 @@ import { model, Schema } from "mongoose";
 import { TUser } from "./user.interface";
 import { status } from "../../constant/status";
 import { roles } from "../../constant/roles";
+import bcrypt from "bcrypt";
+import config from "../../config";
 
 const userSchema = new Schema<TUser>(
   {
     id: {
       type: String,
       unique: true,
-      required: true,
+      default: "",
     },
     password: {
       type: String,
@@ -39,7 +41,7 @@ const userSchema = new Schema<TUser>(
     status: {
       type: String,
       enum: status,
-      default: "inprogress",
+      default: "in-progress",
     },
     isDeleted: {
       type: Boolean,
@@ -50,5 +52,18 @@ const userSchema = new Schema<TUser>(
     timestamps: true,
   }
 );
+
+userSchema.pre("save", async function (next) {
+  this.password = await bcrypt.hash(
+    this.password,
+    Number(config.BCRYPT_SALT_ROUN)
+  );
+  next();
+});
+
+userSchema.post("save", async function (doc, next) {
+  doc.password = "";
+  next();
+});
 
 export const User = model<TUser>("users", userSchema);

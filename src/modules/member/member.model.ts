@@ -5,38 +5,48 @@ const memberSchema = new Schema<TMember>(
   {
     id: {
       type: String,
-      required: true,
       trim: true,
+      default: "",
     },
     user: {
       type: Schema.Types.ObjectId,
-      required: true,
+      required: [true, "User id is required"],
+      ref: "users",
     },
 
     name: {
       type: String,
       required: true,
     },
+    bloodGroup: {
+      type: String,
+      required: [true, "Blood group is required"],
+      enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+    },
 
     email: {
       type: String,
-      required: true,
+      required: [true, "Email id is required"],
     },
-
+    mobileNumber: {
+      type: String,
+      trim: true,
+      required: [true, "Mobile number is required"],
+    },
     bankAccountNo: {
-      type: Number,
-      required: true,
+      type: String,
+      required: [true, "Bank account number is required"],
       trim: true,
     },
 
     bankBranchName: {
       type: String,
-      required: true,
+      required: [true, "Branch name is required"],
     },
 
     bankRoutingNo: {
-      type: Number,
-      required: true,
+      type: String,
+      required: [true, "Bank routing number is required"],
       trim: true,
     },
 
@@ -55,17 +65,18 @@ const memberSchema = new Schema<TMember>(
       required: false,
       trim: true,
     },
-    isAppliedImamCost: {
+    isApplicableImamCost: {
       type: Boolean,
       default: true,
     },
-    isAppliedHelperCost: {
+    isApplicableHelperCost: {
       type: Boolean,
       default: true,
     },
 
     profileImage: {
       type: String,
+      default: "",
     },
     isApproved: {
       type: Boolean,
@@ -73,7 +84,8 @@ const memberSchema = new Schema<TMember>(
     },
     status: {
       type: String,
-      default: "inprogress",
+      enum: ["in-progress", "block"],
+      default: "in-progress",
     },
     isDeleted: {
       type: Boolean,
