@@ -4,7 +4,8 @@ export const createMemberValidationSchema = z.object({
   password: z
     .string()
     .min(6, "Password must be at least 6 digit")
-    .max(16, "Password must be maximum 16 digit"),
+    .max(16, "Password must be maximum 16 digit")
+    .optional(),
 
   member: z.object({
     name: z.string({ required_error: "Name is required" }),

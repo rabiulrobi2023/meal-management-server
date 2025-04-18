@@ -8,9 +8,7 @@ import config from "../../config";
 const userSchema = new Schema<TUser>(
   {
     id: {
-      type: String,
-      unique: true,
-      default: "",
+      type: Number,
     },
     password: {
       type: String,
@@ -37,6 +35,9 @@ const userSchema = new Schema<TUser>(
     isApproved: {
       type: Boolean,
       default: false,
+    },
+    approvedAt: {
+      type: Date,
     },
     status: {
       type: String,
