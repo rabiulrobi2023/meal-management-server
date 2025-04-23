@@ -9,6 +9,8 @@ const userSchema = new Schema<TUser>(
   {
     id: {
       type: Number,
+      required: true,
+      trim: true,
     },
     password: {
       type: String,
@@ -26,6 +28,11 @@ const userSchema = new Schema<TUser>(
       required: true,
       trim: true,
       unique: true,
+    },
+    mobileNumber: {
+      type: String,
+      trim: true,
+      required: true,
     },
     role: {
       type: String,

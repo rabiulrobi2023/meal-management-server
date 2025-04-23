@@ -1,4 +1,4 @@
-import { Date } from "mongoose";
+
 
 export type TUser = {
   id: number;
@@ -6,6 +6,7 @@ export type TUser = {
   needPasswordChange: boolean;
   passworChangeAt: Date;
   email: string;
+  mobileNumber: string;
   role: "admin" | "manager" | "member";
   isApproved: boolean;
   approvedAt: Date;

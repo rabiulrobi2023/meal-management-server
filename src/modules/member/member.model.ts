@@ -8,7 +8,6 @@ const memberSchema = new Schema<TMember>(
     },
     user: {
       type: Schema.Types.ObjectId,
-      required: [true, "User id is required"],
       ref: "users",
     },
 

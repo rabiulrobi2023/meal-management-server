@@ -2,68 +2,31 @@
 import httpStatus from "http-status";
 import { User } from "../user/user.model";
 import AppError from "../../error/AppError";
-import mongoose from "mongoose";
 import { userIdGenerator } from "../user/user.utils";
 import { Member } from "./member.model";
 import { TMember } from "../member/member.interface";
 import { TUser } from "../user/user.interface";
+import config from "../../config";
+import { sendMail } from "../../utils/sendMail";
+import mongoose from "mongoose";
 
-const createMemberIntoDB = async (pass: string, memberData: TMember) => {
-  const isEmailExist = await User.findOne({
-    email: memberData.email,
-  });
-
-  if (isEmailExist) {
-    throw new AppError(httpStatus.CONFLICT, "The email already exist");
+const createMemberRequestIntoDB = async (memberData: TMember) => {
+  const isEmailExists = await Member.findOne({ email: memberData.email });
+  if (isEmailExists) {
+    throw new AppError(httpStatus.BAD_REQUEST, "The email id already used");
   }
-  const session = await mongoose.startSession();
-  try {
-    const userData: Partial<TUser> = {
-      password: pass,
-      email: memberData.email,
-    };
-    session.startTransaction();
-    const newUser = await User.create([userData], { session });
-
-    if (!newUser.length) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        "Fail to sent user creation request"
-      );
-    }
-
-    memberData.user = newUser[0]?._id;
-
-    const newMember = await Member.create([memberData], { session });
-    if (!newMember.length) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        "Fail to sent member creation request"
-      );
-    }
-
-    await session.commitTransaction();
-    await session.endSession();
-    return newMember;
-  } catch (err: any) {
-    await session.abortTransaction();
-    await session.endSession();
-    throw new AppError(httpStatus.BAD_REQUEST, err);
-  }
+  const result = await Member.create(memberData);
+  return result;
 };
 
-export const UserService = {
-  createMemberIntoDB,
-};
-
-const appovedMemberIntoDB = async (id: string) => {
-  const isUserExist = await User.findById(id);
-  if (!isUserExist) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+const appoveMemberRequestIntoDB = async (id: string) => {
+  const isMemberRequestExists = await Member.findById(id);
+  if (!isMemberRequestExists) {
+    throw new AppError(httpStatus.NOT_FOUND, "The member request is not found");
   }
 
-  if (isUserExist.isApproved) {
-    throw new AppError(httpStatus.BAD_REQUEST, "User already approved");
+  if (isMemberRequestExists.isApproved) {
+    throw new AppError(httpStatus.BAD_REQUEST, "The member already approved");
   }
 
   const session = await mongoose.startSession();
@@ -71,42 +34,51 @@ const appovedMemberIntoDB = async (id: string) => {
     session.startTransaction();
     const newId = await userIdGenerator();
 
-    const approvedUser = await User.findByIdAndUpdate(
-      id,
-      {
-        id: newId,
-        isApproved: true,
-        approvedAt: Date.now(),
-      },
-      { new: true, session }
-    );
+    const userData: Partial<TUser> = {
+      id: newId,
+      password: config.DEFAULT_PASS,
+      email: isMemberRequestExists.email,
+      mobileNumber: isMemberRequestExists.mobileNumber,
+      isApproved: true,
+      approvedAt: new Date(Date.now()),
+    };
+    const newUser = await User.create([userData], { session });
 
-    if (!approvedUser) {
-      throw new AppError(httpStatus.NOT_MODIFIED, "User not approved");
+    if (!newUser.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Fail to create user");
     }
 
-    const appovedMember = await Member.findOneAndUpdate(
-      { user: id },
-      { id: approvedUser?.id, isApproved: true },
+    const appovedMember = await Member.findByIdAndUpdate(
+      id,
+      { id: newId, isApproved: true },
       { new: true, session }
     );
 
     if (!appovedMember) {
       throw new AppError(httpStatus.NOT_MODIFIED, "Member not approved");
     }
-
     await session.commitTransaction();
     await session.endSession();
-
+    sendMail(
+      isMemberRequestExists.email,
+      "Meal account approved ",
+      `
+  <div style="font-family: Arial, sans-serif; color: green;">
+    <h2>Welcome</h2>
+    <p style = "font-size:18px; color: gray">Hi ${isMemberRequestExists.name},<br> Your meal account request has been approved. Your meal ID is ${newId} and login password is ${config.DEFAULT_PASS}.</p> <br/>
+    <p>Thanks,<br/>Meal Management System</p>
+  </div>
+`
+    );
     return appovedMember;
-  } catch {
+  } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
-    throw new AppError(httpStatus.NOT_MODIFIED, "Member not approved..");
+    throw new AppError(httpStatus.NOT_MODIFIED, err);
   }
 };
 
 export const MemberService = {
-  createMemberIntoDB,
-  appovedMemberIntoDB,
+  createMemberRequestIntoDB,
+  appoveMemberRequestIntoDB,
 };
