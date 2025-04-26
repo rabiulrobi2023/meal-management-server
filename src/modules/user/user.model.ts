@@ -8,7 +8,7 @@ import config from "../../config";
 const userSchema = new Schema<TUser>(
   {
     id: {
-      type: Number,
+      type: String,
       required: true,
       trim: true,
     },

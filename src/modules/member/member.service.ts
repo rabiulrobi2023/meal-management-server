@@ -2,7 +2,7 @@
 import httpStatus from "http-status";
 import { User } from "../user/user.model";
 import AppError from "../../error/AppError";
-import { userIdGenerator } from "../user/user.utils";
+import { memberIdGenerator } from "./member.utils";
 import { Member } from "./member.model";
 import { TMember } from "../member/member.interface";
 import { TUser } from "../user/user.interface";
@@ -37,7 +37,7 @@ const approveAccountIntoDB = async (id: string) => {
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
-    const newId = await userIdGenerator();
+    const newId = await memberIdGenerator();
 
     const userData: Partial<TUser> = {
       id: newId,

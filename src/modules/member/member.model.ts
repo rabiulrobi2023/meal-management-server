@@ -4,7 +4,7 @@ import { TMember } from "./member.interface";
 const memberSchema = new Schema<TMember>(
   {
     id: {
-      type: Number,
+      type: String,
     },
     user: {
       type: Schema.Types.ObjectId,

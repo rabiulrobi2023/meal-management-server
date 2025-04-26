@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 
 export type TMember = {
-  id: number;
+  id: string;
   user: Types.ObjectId;
   name: string;
   bloodGroup: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
