@@ -35,6 +35,10 @@ const memberSchema = new Schema<TMember>(
       required: [true, "Bank account number is required"],
       trim: true,
     },
+    bankName: {
+      type: String,
+      required: true,
+    },
 
     bankBranchName: {
       type: String,
@@ -78,11 +82,6 @@ const memberSchema = new Schema<TMember>(
     isApproved: {
       type: Boolean,
       default: false,
-    },
-    status: {
-      type: String,
-      enum: ["in-progress", "block"],
-      default: "in-progress",
     },
     isDeleted: {
       type: Boolean,

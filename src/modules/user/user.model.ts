@@ -15,6 +15,8 @@ const userSchema = new Schema<TUser>(
     password: {
       type: String,
       required: true,
+      select:0
+  
     },
     needPasswordChange: {
       type: Boolean,
@@ -38,10 +40,6 @@ const userSchema = new Schema<TUser>(
       type: String,
       enum: roles,
       default: "member",
-    },
-    isApproved: {
-      type: Boolean,
-      default: false,
     },
     approvedAt: {
       type: Date,

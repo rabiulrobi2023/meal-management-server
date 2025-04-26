@@ -6,11 +6,16 @@ import { MemberValidation } from "./member.validation";
 const router = Router();
 
 router.post(
-  "/create-member-request",
+  "/create-account-request",
   validationRequest(MemberValidation.createMemberValidationSchema),
   MemberController.createMemberRequest
 );
-
-router.patch("/approve-member/:id", MemberController.approvedMemberRequest);
+router.patch("/approve-account/:id", MemberController.approvedMemberRequest);
+router.get("/all-member", MemberController.getAllMember);
+router.get("/:id", MemberController.getSingleMember);
+router.delete(
+  "/reject-account-request/:id",
+  MemberController.rejectAccountRequest
+);
 
 export const MemberRotes = router;

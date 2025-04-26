@@ -8,6 +8,7 @@ export type TMember = {
   email: string;
   mobileNumber: string;
   bankAccountNo: string;
+  bankName: string;
   bankBranchName: string;
   bankRoutingNo: string;
   bKashNo: string;
@@ -17,6 +18,5 @@ export type TMember = {
   isApplicableHelperCost: boolean;
   profileImage: string;
   isApproved: boolean;
-  status: "in-progress" | "block";
   isDeleted: boolean;
 };

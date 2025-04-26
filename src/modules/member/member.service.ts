@@ -9,8 +9,10 @@ import { TUser } from "../user/user.interface";
 import config from "../../config";
 import { sendMail } from "../../utils/sendMail";
 import mongoose from "mongoose";
+import { searchableField } from "./member.constat";
+import QueryBuilder from "../../builder/QueryBuilder";
 
-const createMemberRequestIntoDB = async (memberData: TMember) => {
+const createAccountIntoDB = async (memberData: TMember) => {
   const isEmailExists = await Member.findOne({ email: memberData.email });
   if (isEmailExists) {
     throw new AppError(httpStatus.BAD_REQUEST, "The email id already used");
@@ -19,14 +21,17 @@ const createMemberRequestIntoDB = async (memberData: TMember) => {
   return result;
 };
 
-const appoveMemberRequestIntoDB = async (id: string) => {
-  const isMemberRequestExists = await Member.findById(id);
-  if (!isMemberRequestExists) {
-    throw new AppError(httpStatus.NOT_FOUND, "The member request is not found");
+const approveAccountIntoDB = async (id: string) => {
+  const isAccountRequestExists = await Member.findById(id);
+  if (!isAccountRequestExists) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "The account request is not found"
+    );
   }
 
-  if (isMemberRequestExists.isApproved) {
-    throw new AppError(httpStatus.BAD_REQUEST, "The member already approved");
+  if (isAccountRequestExists.isApproved) {
+    throw new AppError(httpStatus.BAD_REQUEST, "The account already approved");
   }
 
   const session = await mongoose.startSession();
@@ -37,9 +42,8 @@ const appoveMemberRequestIntoDB = async (id: string) => {
     const userData: Partial<TUser> = {
       id: newId,
       password: config.DEFAULT_PASS,
-      email: isMemberRequestExists.email,
-      mobileNumber: isMemberRequestExists.mobileNumber,
-      isApproved: true,
+      email: isAccountRequestExists.email,
+      mobileNumber: isAccountRequestExists.mobileNumber,
       approvedAt: new Date(Date.now()),
     };
     const newUser = await User.create([userData], { session });
@@ -48,29 +52,32 @@ const appoveMemberRequestIntoDB = async (id: string) => {
       throw new AppError(httpStatus.BAD_REQUEST, "Fail to create user");
     }
 
-    const appovedMember = await Member.findByIdAndUpdate(
+    const appovedAccount = await Member.findByIdAndUpdate(
       id,
-      { id: newId, isApproved: true },
+      { id: newUser[0].id, isApproved: true, user: newUser[0]?._id },
       { new: true, session }
     );
 
-    if (!appovedMember) {
-      throw new AppError(httpStatus.NOT_MODIFIED, "Member not approved");
+    if (!appovedAccount) {
+      throw new AppError(
+        httpStatus.NOT_MODIFIED,
+        "The account approval failed."
+      );
     }
     await session.commitTransaction();
     await session.endSession();
     sendMail(
-      isMemberRequestExists.email,
-      "Meal account approved ",
+      isAccountRequestExists.email,
+      "Meal account approved",
       `
   <div style="font-family: Arial, sans-serif; color: green;">
     <h2>Welcome</h2>
-    <p style = "font-size:18px; color: gray">Hi ${isMemberRequestExists.name},<br> Your meal account request has been approved. Your meal ID is ${newId} and login password is ${config.DEFAULT_PASS}.</p> <br/>
+    <p style = "font-size:16px; color: gray">Hi ${isAccountRequestExists.name},<br> Your meal account request has been approved. Your meal ID is ${newId} and login password is ${config.DEFAULT_PASS}.</p> <br/>
     <p>Thanks,<br/>Meal Management System</p>
   </div>
 `
     );
-    return appovedMember;
+    return appovedAccount;
   } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
@@ -78,7 +85,57 @@ const appoveMemberRequestIntoDB = async (id: string) => {
   }
 };
 
+const getAllmemberFromDB = async (query: Record<string, unknown>) => {
+  const allMembers = new QueryBuilder(
+    Member.find({ isDeleted: false }).populate("user"),
+    query
+  )
+    .search(searchableField)
+    .filter()
+    .sort()
+    .fields()
+    .limit()
+    .paginate();
+  const result = allMembers.queryModel;
+  return result;
+};
+
+const getSingleMemberFromDB = async (memberId: string) => {
+  const user = await User.findOne({ id: memberId });
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "The account is not found.");
+  }
+
+  if (user.isDeleted) {
+    throw new AppError(httpStatus.NOT_FOUND, "The account is deleted.");
+  }
+  if (user.status === "block") {
+    throw new AppError(httpStatus.FORBIDDEN, "The account is blocked.");
+  }
+  const result = await Member.findOne({ id: memberId });
+  if (!result?.isApproved) {
+    throw new AppError(httpStatus.FORBIDDEN, "The account is not approved.");
+  }
+  return result;
+};
+
+const rejectAccountRequest = async (id: string) => {
+  const iAccountRequestExists = await Member.findById(id);
+  if (!iAccountRequestExists) {
+    throw new AppError(httpStatus.NOT_FOUND, "The request not fuound");
+  }
+  if (iAccountRequestExists.isApproved) {
+    throw new AppError(httpStatus.CONFLICT, "The account already approved");
+  }
+
+  const result = await Member.findByIdAndDelete(id);
+  return result;
+};
+
 export const MemberService = {
-  createMemberRequestIntoDB,
-  appoveMemberRequestIntoDB,
+  createAccountIntoDB,
+  approveAccountIntoDB,
+  getAllmemberFromDB,
+  getSingleMemberFromDB,
+  rejectAccountRequest,
 };

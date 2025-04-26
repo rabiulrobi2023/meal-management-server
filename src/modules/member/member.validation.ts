@@ -12,6 +12,9 @@ export const createMemberValidationSchema = z.object({
   bankAccountNo: z.string({
     required_error: "Bank account number is required",
   }),
+  bankName: z.string({
+    required_error: "Bank name required",
+  }),
   bankBranchName: z.string({ required_error: "Branch name is required" }),
   bankRoutingNo: z.string({
     required_error: "Bank routing number is required",

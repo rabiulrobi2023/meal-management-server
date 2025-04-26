@@ -1,5 +1,3 @@
-
-
 export type TUser = {
   id: number;
   password: string;
@@ -8,7 +6,6 @@ export type TUser = {
   email: string;
   mobileNumber: string;
   role: "admin" | "manager" | "member";
-  isApproved: boolean;
   approvedAt: Date;
   status: "in-progress" | "block";
   isDeleted: boolean;
