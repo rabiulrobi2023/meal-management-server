@@ -9,6 +9,7 @@ import { adminIdGenerator } from "./admin.utils";
 import { TUser } from "../user/user.interface";
 import config from "../../config";
 import { Admin } from "./admin.model";
+import { sendMail } from "../../utils/sendMail";
 
 const createAdminIntoDB = async (payload: Partial<TAdmin>) => {
   const isEmailExists = await User.findOne({ email: payload.email });
@@ -41,6 +42,17 @@ const createAdminIntoDB = async (payload: Partial<TAdmin>) => {
     }
     await session.commitTransaction();
     await session.endSession();
+    sendMail(
+      newAdmin[0].email,
+      "Admin Power",
+      `
+      <div style="font-family: Arial, sans-serif;color:green;">
+        <h1>Welcome</h1>
+        <p style = "font-size:16px; color: gray">Hi ${newAdmin[0].name},<br> You are now an admin of the Meal Management System. Your admin ID is <span style = "font-size:20px; color: #c94c4c">${newAdmin[0].id}</span> and your login password is <span style="font-size:20px; color: #c94c4c">${config.DEFAULT_PASS}</span>.</p> <br/>
+        <p>Thanks,<br/>Meal Management System</p>
+      </div>
+    `
+    );
     return newAdmin;
   } catch (err: any) {
     await session.abortTransaction();

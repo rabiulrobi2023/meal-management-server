@@ -13,10 +13,17 @@ import { searchableField } from "./member.constat";
 import QueryBuilder from "../../builder/QueryBuilder";
 
 const createAccountIntoDB = async (memberData: TMember) => {
-  const isEmailExists = await Member.findOne({ email: memberData.email });
-  if (isEmailExists) {
+  const isEmailExistsInMember = await Member.findOne({ email: memberData.email });
+  if (isEmailExistsInMember) {
     throw new AppError(httpStatus.BAD_REQUEST, "The email id already used");
   }
+
+  const isEmailExistInUser = await User.findOne({email: memberData.email})
+  if(isEmailExistInUser){
+    throw new AppError(httpStatus.BAD_REQUEST,"The email already used")
+  }
+
+
   const result = await Member.create(memberData);
   return result;
 };

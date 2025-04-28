@@ -1,8 +1,8 @@
-import { ObjectId } from "mongoose";
+import {Types } from "mongoose";
 
 export type TAdmin = {
   id: string;
-  user: ObjectId;
+  user: Types.ObjectId;
   name: string;
   email: string;
   mobileNumber: string

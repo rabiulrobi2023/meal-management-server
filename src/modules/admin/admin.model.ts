@@ -1,4 +1,4 @@
-import mongoose, { model } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 import { TAdmin } from "./admin.interface";
 
 const adminSchema = new mongoose.Schema<TAdmin>({
@@ -7,7 +7,8 @@ const adminSchema = new mongoose.Schema<TAdmin>({
     required: [true, "Name is required"],
   },
   user: {
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref:'users',
     required: [true, "User id is required"],
   },
   name: {

@@ -13,7 +13,7 @@ export const sendMail = async (to: string, sub: string, html: string) => {
     },
   });
   await transporter.sendMail({
-    from: `"Meal Management" ${config.SENDER_MAIL}`,
+    from: `"Meal Management System" ${config.SENDER_MAIL}`,
     to,
     subject: sub,
     html,
