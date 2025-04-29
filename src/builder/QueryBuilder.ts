@@ -9,16 +9,31 @@ class QueryBuilder<T> {
     this.query = query;
   }
 
-  search(searchableField: string[]) {
-    const searchTerm = this.query.searchTerm || "";
-    this.queryModel = this.queryModel.find({
-      $or: searchableField.map(
-        (field) =>
-          ({
-            [field]: { $regex: searchTerm },
-          } as FilterQuery<T>)
-      ),
-    });
+  search(searchableFields: { field: string; type: "string" | "number" }[]) {
+    const searchTerm = this?.query?.searchTerm || "";
+    if (!searchTerm) {
+      return this;
+    }
+
+    const orConditions: FilterQuery<T>[] = searchableFields.flatMap(
+      ({ field, type }) => {
+        if (type === "string") {
+          return [
+            { [field]: { $regex: searchTerm, $options: "i" } },
+          ] as FilterQuery<T>;
+        }
+
+        if (type === "number") {
+          const num = Number(searchTerm);
+          return [{ [field]: num }] as FilterQuery<T>;
+        }
+        return [];
+      }
+    );
+
+    if (orConditions.length) {
+      this.queryModel = this.queryModel.find({ $or: orConditions });
+    }
     return this;
   }
 

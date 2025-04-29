@@ -10,4 +10,6 @@ router.post(
   ManagerController.createManager
 );
 
+router.get("/all", ManagerController.getAllManager);
+
 export const ManagerRouter = router;

@@ -12,6 +12,19 @@ const createManager = catchAsync(async (req, res) => {
   });
 });
 
+const getAllManager = catchAsync(async (req, res) => {
+  const query = req.query;
+
+  const result = await ManagerService.getAllManagerFromDB(query);
+  sendResponse(res, {
+    message: `${
+      result.length > 0 ? "Manager retrived successfully" : "Not found"
+    }`,
+    data: result,
+  });
+});
+
 export const ManagerController = {
   createManager,
+  getAllManager,
 };

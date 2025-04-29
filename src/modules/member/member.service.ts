@@ -9,20 +9,21 @@ import { TUser } from "../user/user.interface";
 import config from "../../config";
 import { sendMail } from "../../utils/sendMail";
 import mongoose from "mongoose";
-import { searchableField } from "./member.constat";
+import { searchableFieldsOfMember } from "./member.constat";
 import QueryBuilder from "../../builder/QueryBuilder";
 
 const createAccountIntoDB = async (memberData: TMember) => {
-  const isEmailExistsInMember = await Member.findOne({ email: memberData.email });
+  const isEmailExistsInMember = await Member.findOne({
+    email: memberData.email,
+  });
   if (isEmailExistsInMember) {
     throw new AppError(httpStatus.BAD_REQUEST, "The email id already used");
   }
 
-  const isEmailExistInUser = await User.findOne({email: memberData.email})
-  if(isEmailExistInUser){
-    throw new AppError(httpStatus.BAD_REQUEST,"The email already used")
+  const isEmailExistInUser = await User.findOne({ email: memberData.email });
+  if (isEmailExistInUser) {
+    throw new AppError(httpStatus.BAD_REQUEST, "The email already used");
   }
-
 
   const result = await Member.create(memberData);
   return result;
@@ -97,7 +98,7 @@ const getAllmemberFromDB = async (query: Record<string, unknown>) => {
     Member.find({ isDeleted: false }).populate("user"),
     query
   )
-    .search(searchableField)
+    .search(searchableFieldsOfMember)
     .filter()
     .sort()
     .fields()

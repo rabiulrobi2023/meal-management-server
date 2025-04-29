@@ -9,6 +9,8 @@ import { User } from "../user/user.model";
 import mongoose from "mongoose";
 import { roles } from "../../constant/roles";
 import { sendMail } from "../../utils/sendMail";
+import QueryBuilder from "../../builder/QueryBuilder";
+import { searchableFieldOfManager } from "./manager.constant";
 
 const createManagerIntoDB = async (
   memberObjId: string,
@@ -117,6 +119,21 @@ const createManagerIntoDB = async (
     throw new AppError(httpStatus.BAD_REQUEST, err);
   }
 };
+
+const getAllManagerFromDB = async (query: Record<string, unknown>) => {
+  const allManager = new QueryBuilder(Manager.find(), query)
+    .search(searchableFieldOfManager)
+    .filter()
+    .sort()
+    .fields()
+    .limit()
+    .paginate();
+
+  const result = allManager.queryModel;
+  return result;
+};
+
 export const ManagerService = {
   createManagerIntoDB,
+  getAllManagerFromDB,
 };

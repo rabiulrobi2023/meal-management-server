@@ -2,7 +2,11 @@ import nodemailer from "nodemailer";
 import config from "../config";
 import { environment } from "../constant/environment";
 
-export const sendMail = async (to: string, sub: string, html: string) => {
+export const sendMail = async (
+  to: string | string[],
+  sub: string,
+  html: string
+) => {
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: config.NODE_ENV === environment.pro ? 465 : 587,
@@ -14,7 +18,7 @@ export const sendMail = async (to: string, sub: string, html: string) => {
   });
   await transporter.sendMail({
     from: `"Meal Management System" ${config.SENDER_MAIL}`,
-    to,
+    to: Array.isArray(to) ? to.join(",") : to,
     subject: sub,
     html,
   });
