@@ -1,9 +1,9 @@
 import { model, Schema } from "mongoose";
 import { TUser } from "./user.interface";
-import { status } from "../../constant/status";
-import { roles } from "../../constant/roles";
+import { roles } from "../../constant/role.constant";
 import bcrypt from "bcrypt";
 import config from "../../config";
+import { userStatus } from "../../constant/status.constant";
 
 const userSchema = new Schema<TUser>(
   {
@@ -15,8 +15,7 @@ const userSchema = new Schema<TUser>(
     password: {
       type: String,
       required: true,
-      select:0
-  
+      select: 0,
     },
     needPasswordChange: {
       type: Boolean,
@@ -38,16 +37,16 @@ const userSchema = new Schema<TUser>(
     },
     role: {
       type: String,
-      enum: roles,
-      default: "member",
+      enum: Object.values(roles),
+      default: roles.member,
     },
     approvedAt: {
       type: Date,
     },
     status: {
       type: String,
-      enum: status,
-      default: "in-progress",
+      enum: Object.values(userStatus),
+      default: userStatus.inProgress,
     },
     isDeleted: {
       type: Boolean,

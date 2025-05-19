@@ -3,6 +3,8 @@ import { UserRouter } from "../modules/user/user.routes";
 import { MemberRotes } from "../modules/member/member.routes";
 import { AdminRouter } from "../modules/admin/admin.routes";
 import { ManagerRouter } from "../modules/manager/manager.routes";
+import { MealRegistrationRoutes } from "../modules/mealRegistration/mealRegistration.routes";
+import { PurchaseMealRouter } from "../modules/purchaseMeal/purchaseMeal.routes";
 
 const router = Router();
 
@@ -26,6 +28,14 @@ const moduleRoutes = [
   {
     path: "/manager",
     route: ManagerRouter,
+  },
+  {
+    path: "/meal-registration",
+    route: MealRegistrationRoutes,
+  },
+  {
+    path: "/purchase-meal",
+    route: PurchaseMealRouter,
   },
 ];
 

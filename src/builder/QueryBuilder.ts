@@ -20,23 +20,25 @@ class QueryBuilder<T> {
         if (type === "string") {
           return [
             { [field]: { $regex: searchTerm, $options: "i" } },
-          ] as FilterQuery<T>;
+          ] as FilterQuery<T>[];
         }
 
         if (type === "number") {
           const num = Number(searchTerm);
-          return [{ [field]: num }] as FilterQuery<T>;
+          if (isNaN(num)) return [];
+          return [{ [field]: num }] as FilterQuery<T>[];
         }
+
         return [];
       }
     );
 
-    if (orConditions.length) {
+    if (orConditions.length > 0) {
       this.queryModel = this.queryModel.find({ $or: orConditions });
     }
+
     return this;
   }
-
   filter() {
     const queryObj = { ...this?.query };
     const excludeFields = ["searchTerm", "sort", "limit", "page", "fields"];

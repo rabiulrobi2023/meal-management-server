@@ -10,6 +10,7 @@ router.post(
   ManagerController.createManager
 );
 
-router.get("/all", ManagerController.getAllManager);
+router.get("/", ManagerController.getAllManager);
+router.patch("/close-manager/:id", ManagerController.closeManger);
 
 export const ManagerRouter = router;

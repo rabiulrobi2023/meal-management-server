@@ -1,21 +1,10 @@
 import { Types } from "mongoose";
+import { monthLiteral } from "../../constant/dateTime.constant";
 
 export type TManager = {
   memberId: string;
   member: Types.ObjectId;
-  month:
-    | "Jan"
-    | "Feb"
-    | "Mar"
-    | "Apr"
-    | "May"
-    | "Jun"
-    | "Jul"
-    | "Aug"
-    | "Sep"
-    | "Oct"
-    | "Nov"
-    | "Dec";
+  month: monthLiteral;
   year: number;
   status: "running" | "ended";
 };

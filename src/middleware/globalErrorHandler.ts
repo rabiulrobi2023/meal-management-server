@@ -30,7 +30,8 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     statusCode = simplifyError.statusCode;
     message = simplifyError.message;
     source = simplifyError.errorSources;
-  } else if (err instanceof Error) {
+  } else if (err instanceof AppError) {
+    statusCode = err?.statusCode;
     message = err?.message;
     source = [
       {
@@ -38,8 +39,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
         message: err?.message,
       },
     ];
-  } else if (err instanceof AppError) {
-    statusCode = err?.statusCode;
+  } else if (err instanceof Error) {
     message = err?.message;
     source = [
       {
